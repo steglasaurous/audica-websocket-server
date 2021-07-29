@@ -24,6 +24,8 @@ namespace AudicaWebsocketServer {
         // Util
         private SongLengthCalculator songCalculator;
 
+        // FIXME: Might make sense to make this flag an indicator that it should be reading progress regularly, and add something
+        //        to the SongProgress struct to indicate if the song is playing vs paused or finished.
         private bool songPlaying = false;
         public SongList.SongData songData { get; set; } 
 
@@ -121,7 +123,6 @@ namespace AudicaWebsocketServer {
         }
 
         private void pollGameState() {
-            // prefs (here's hoping color utility isn't dog slow!)
             this.gameState.leftColor = AudicaGameStateManager.prefs ? ColorUtility.ToHtmlStringRGB(AudicaGameStateManager.prefs.GunColorLeft.mVal) : "#000000";
             this.gameState.rightColor = AudicaGameStateManager.prefs ? ColorUtility.ToHtmlStringRGB(AudicaGameStateManager.prefs.GunColorRight.mVal) : "#000000";
             this.gameState.targetSpeed = AudicaGameStateManager.prefs ? AudicaGameStateManager.prefs.TargetSpeedMultiplier.mVal : 1;
@@ -174,7 +175,6 @@ namespace AudicaWebsocketServer {
 
                 // Changes as player progresses
                 AudicaSongPlayerStatus newSongPlayerStatus = new AudicaSongPlayerStatus();
-
                 newSongPlayerStatus.health = (float)Math.Round(AudicaGameStateManager.scoreKeeper.GetHealth(), 2);
                 newSongPlayerStatus.score = AudicaGameStateManager.scoreKeeper.mScore;
                 newSongPlayerStatus.scoreMultiplier = AudicaGameStateManager.scoreKeeper.GetRawMultiplier();
@@ -183,7 +183,6 @@ namespace AudicaWebsocketServer {
                 newSongPlayerStatus.isFullComboSoFar = AudicaGameStateManager.scoreKeeper.GetIsFullComboSoFar();
                 newSongPlayerStatus.isNoFailMode = AudicaGameStateManager.prefs.NoFail.mVal;
                 newSongPlayerStatus.isPracticeMode = AudicaGameStateManager.config.practiceMode;
-
 
                 // Changes if twitch modifiers happen (or in-game stuff)
                 newSongPlayerStatus.songSpeed = KataConfig.GetCueDartSpeedMultiplier();      // TODO: not a clue what this value actually is but it's not the speed multiplier!
@@ -195,13 +194,10 @@ namespace AudicaWebsocketServer {
 
                 // As we update the songState overall, determine which pieces changed, and let the caller know
                 // what changed so websocket events can be emitted.
-                
-                
+                // FIXME: Is this indeed the most efficient means of doing this?  Or should we look at a pub/sub / Observer pattern here?
                 if (!this.songState.songInfo.Equals(newSongInfo))
                 {
                     changedStates.Add("SongInfo");
-                    // Set a flag to return?
-                    // FIXME: How to inform the caller what happens.  Could do an array of flags?  Bits?
                 }
 
                 if (!this.songState.songPlayerStatus.Equals(newSongPlayerStatus))

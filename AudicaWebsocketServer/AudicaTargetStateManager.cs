@@ -55,7 +55,11 @@ namespace AudicaWebsocketServer {
         }
 
         public AudicaTargetFailState TargetMissEarlyLate() {
+            // FIXME: Find out how I might get more target info so early/late can be determined
+            
             AudicaTargetFailState targetMiss = new AudicaTargetFailState();
+
+            // FIXME: Seems to be blowing up here too complaining the instance doesn't exist
             SongCues.Cue cue = AudicaTargetStateManager.targetTracker.mLastEitherHandTarget.target.GetCue();
 
             targetMiss.targetIndex = cue.index;

@@ -6,6 +6,9 @@ namespace AudicaWebsocketServer.util {
      * Calculates arbitrary time periods within a song. THIS CLASS SHOULD BE RECONSTRUCTED ON SONG START!
      * Note that on certain maps (you know who you are) calculating the lengths can be extremely expensive. 
      * Use with caution and cache where appropriate.
+     * 
+     * Class originally written by jukibom as part of the audica-http-status mod
+     * https://github.com/jukibom/audica-http-status
      */
     class SongLengthCalculator {
 

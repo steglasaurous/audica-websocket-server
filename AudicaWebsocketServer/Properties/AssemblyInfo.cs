@@ -37,6 +37,6 @@ using MelonLoader;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
 // FIXME: Use .BuildInfo.Name, Version, etc instead of hard-coding it here.
-[assembly: MelonInfo(typeof(AudicaWebsocketServer.AudicaWebsocketServerMain), "Audica Test Mod", "1.0.0", "Steglasaurous")]
+[assembly: MelonInfo(typeof(AudicaWebsocketServer.AudicaWebsocketServerMain), "Audica Websocket Server", "1.0.0", "Steglasaurous")]
 // FIXME: Replace with the correct Audica definition, since this is NOT a universal mod. 
 [assembly: MelonGame(null, null)]

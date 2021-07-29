@@ -54,6 +54,7 @@ namespace AudicaWebsocketServer
                 this.isNoFailMode == other.isNoFailMode &&
                 this.isPracticeMode == other.isPracticeMode &&
                 this.songSpeed == other.songSpeed;
+            // FIXME: Should compare against modifiers as well, but need to figure out how comparing lists work.
 
         }
     }
@@ -82,33 +83,6 @@ namespace AudicaWebsocketServer
         }
     }
 
-    //struct AudicaSongState {
-
-    //    public string songId;
-    //    public string songName;
-    //    public string songArtist;
-    //    public string songAuthor;
-    //    public string difficulty;       // "beginner" | "standard" | "advanced" | "expert"
-    //    public string classification;   // "ost" | "dlc" | "extra" | "custom"
-    //    public string songLength;       // UTC
-    //    public string timeElapsed;      // UTC
-    //    public string timeRemaining;    // UTC
-    //    public float progress;          // 0-1, 0 = start, 1 = end
-    //    public float currentTick;       // Hmx.Audio.MidiPlayCursor.GetCurrentTick
-    //    public float ticksTotal;
-    //    public float songSpeed;         // 1 = 100%
-    //    public float health;
-    //    public int score;
-    //    public int scoreMultiplier;
-    //    public int streak;
-    //    public int highScore;
-    //    public bool isNoFailMode;
-    //    public bool isPracticeMode;
-    //    public bool isFullComboSoFar;
-    //    public List<string> modifiers;
-    //}
-
-
     struct AudicaSongState {
         public AudicaSongInfo songInfo;
         public AudicaSongProgress songProgress;
@@ -123,7 +97,8 @@ namespace AudicaWebsocketServer
         public float timingScore;
         public float aimScore;
         public float tick;
-        //public UnityEngine.Vector2 targetHitPosition;
+        //public UnityEngine.Vector2 targetHitPosition; 
+        // Storing a string representation, as the JSON converter runs into circular references if trying to encode the Vector2 directly.
         public string targetHitPosition;
     }
 

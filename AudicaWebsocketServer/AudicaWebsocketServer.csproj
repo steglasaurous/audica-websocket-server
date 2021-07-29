@@ -71,7 +71,6 @@
     <Compile Include="Encoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="types\State.cs" />
-    <Compile Include="util\SimpleJSON.cs" />
     <Compile Include="util\SongLengthCalculator.cs" />
   </ItemGroup>
   <ItemGroup>

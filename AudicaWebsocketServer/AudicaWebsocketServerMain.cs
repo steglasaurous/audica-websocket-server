@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MelonLoader;
-using UnityEngine; // Input is in here, and Input.GetKeyDown requires UnhollowerBaseLib to be referenced as well. 
+using UnityEngine;
 using HarmonyLib;
 using WebSocketSharp.Server;
 
@@ -17,6 +17,11 @@ namespace AudicaWebsocketServer
         
         internal static Encoder encoder;
 
+        // For moderating how often to send SongProgress events.  This is a unix timestamp,
+        // but could be changed from seconds to milliseconds if more frequent song progress updates
+        // are desired.
+        // Consider loading this value from a config file?  With some sensible limits so game/websocket performance
+        // isn't adversely affected.
         private long lastProgressUpdate;
 
         public override void OnApplicationStart()
@@ -27,8 +32,8 @@ namespace AudicaWebsocketServer
 
             encoder = new Encoder();
 
+            // FIXME: Make this configurable via config file
             MelonLogger.Msg("Starting websocket server on port 8085.  Access using ws://localhost:8085/AudicaStats.");
-            // Startup websocket server here.
             wssv = new WebSocketServer(8085);
             wssv.AddWebSocketService<AudicaStats>("/AudicaStats");
             wssv.Start();
@@ -100,7 +105,6 @@ namespace AudicaWebsocketServer
                 MelonLogger.Msg("Restart Song");
                 AudicaWebsocketServerMain.AudicaGameState.SongRestart();
                 wssv.WebSocketServices.Broadcast(encoder.SongRestart());
-                // FIXME: Emit restart so connected clients know to update stats
             }
         }
         
@@ -134,9 +138,10 @@ namespace AudicaWebsocketServer
             public static void Postfix()
             {
                 MelonLogger.Msg("Shot nothing!");
+                // FIXME: This seems to fail when trying to get certain details about the target miss. Fix.
                 AudicaTargetFailState targetMiss = AudicaWebsocketServerMain.AudicaTargetState.TargetMiss();
                 wssv.WebSocketServices.Broadcast(AudicaWebsocketServerMain.encoder.TargetMiss(targetMiss));
-                // TODO: feed output into JSON parser then to HTTP server as websocket event
+                
             }
         }
 
@@ -146,6 +151,7 @@ namespace AudicaWebsocketServer
             public static void Postfix()
             {
                 MelonLogger.Msg("Target Miss (aim)!");
+                // FIXME: This seems to fail when trying to get certain details about the target miss. Fix.
                 AudicaTargetFailState targetMiss = AudicaWebsocketServerMain.AudicaTargetState.TargetMissAim();
                 wssv.WebSocketServices.Broadcast(AudicaWebsocketServerMain.encoder.TargetMiss(targetMiss));
             }
@@ -157,7 +163,7 @@ namespace AudicaWebsocketServer
             public static void Postfix(SongCues.Cue cue, float tick)
             {
                 MelonLogger.Msg("Target Miss (timing)!");
-                // NOTE: seems tick doesn't exist when this is called - getting instance doesn't exist issue
+                // FIXME: seems tick doesn't exist when this is called - getting instance doesn't exist issue
                 // for now, just ignoring the tick.
                 AudicaTargetFailState targetMiss = AudicaWebsocketServerMain.AudicaTargetState.TargetMissEarlyLate();
                 wssv.WebSocketServices.Broadcast(AudicaWebsocketServerMain.encoder.TargetMiss(targetMiss));
@@ -171,7 +177,7 @@ namespace AudicaWebsocketServer
             {
                 MelonLogger.Msg("Misfire!");
                 
-                // TODO (event with hand that misfired?)
+                // FIXME: Fire some sort of event when this happens (if it happens?)
             }
         }
 
@@ -180,8 +186,6 @@ namespace AudicaWebsocketServer
     public class AudicaStats : WebSocketBehavior
     {
         // TODO: Have something that can respond to requests - ex: Get current song, etc
-
+        // FIXME: On connect, emit current song data, progress and player stats so new clients are up-to-date.
     }
-
-    
 }

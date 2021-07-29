@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudicaWebsocketServer", "AudicaTestMod1\AudicaWebsocketServer.csproj", "{0C9FCB72-12A2-4F65-A86A-F9929C32440A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudicaWebsocketServer", "AudicaWebsocketServer\AudicaWebsocketServer.csproj", "{0C9FCB72-12A2-4F65-A86A-F9929C32440A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
