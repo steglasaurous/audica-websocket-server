@@ -6,7 +6,7 @@ Note this, like many mods, is a work-in-progress.  There may be bugs :)  Please 
 
 ## Usage
 
-Copy the DLL file into the Mods folder in your Audica installation and start!  
+Unzip the .zip file into the root of your Audica folder.  
 
 The Websocket server will be available at `ws://localhost:8085/AudicaStats`.
 
