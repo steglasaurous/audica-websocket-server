@@ -79,6 +79,15 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy "$(TargetPath)" "D:\Steam\steamapps\common\Audica\Mods\$(TargetFileName)"
-copy "$(TargetDir)\$(TargetName).pdb" "D:\Steam\steamapps\common\Audica\Mods\$(TargetName).pdb"</PostBuildEvent>
+if $(ConfigurationName) == Release (
+rmdir /s /q "$(TargetDir)output-package"
+mkdir "$(TargetDir)output-package"
+mkdir "$(TargetDir)output-package\Mods"
+copy "$(TargetPath)" "$(TargetDir)output-package\Mods"
+copy "$(TargetDir)websocket-sharp.dll" "$(TargetDir)output-package
+rmdir /s /q "$(SolutionDir)PublishOutput"
+mkdir $(SolutionDir)PublishOutput
+powershell -command Compress-Archive -Path "$(TargetDir)output-package\*" -DestinationPath "$(SolutionDir)PublishOutput\AudicaWebsocketServer.zip" -Force
+)</PostBuildEvent>
   </PropertyGroup>
 </Project>
