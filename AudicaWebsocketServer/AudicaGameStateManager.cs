@@ -175,12 +175,12 @@ namespace AudicaWebsocketServer {
                 newSongInfo.songAuthor = this.songData.author;
                 newSongInfo.difficulty = KataConfig.GetDifficultyName(AudicaGameStateManager.config.GetDifficulty());
                 newSongInfo.classification = songClass;
-                newSongInfo.songLength = TimeSpan.FromMilliseconds(Convert.ToInt64(totalTimeMs)).ToString("m:ss");
+                newSongInfo.songLength = TimeSpan.FromMilliseconds(Convert.ToInt64(totalTimeMs)).ToString(@"m\:ss");
                 newSongInfo.ticksTotal = songEndTicks;
 
                 AudicaSongProgress newSongProgress = new AudicaSongProgress();
-                newSongProgress.timeElapsed = TimeSpan.FromMilliseconds(Convert.ToInt64(currentTimeMs)).ToString("m:ss");
-                newSongProgress.timeRemaining = TimeSpan.FromMilliseconds(Convert.ToInt64(remainingTimeMs)).ToString("m:ss");
+                newSongProgress.timeElapsed = TimeSpan.FromMilliseconds(Convert.ToInt64(currentTimeMs)).ToString(@"m\:ss");
+                newSongProgress.timeRemaining = TimeSpan.FromMilliseconds(Convert.ToInt64(remainingTimeMs)).ToString(@"m\:ss");
                 newSongProgress.progress = currentTimeMs / totalTimeMs;
                 newSongProgress.currentTick = currentTick;
 
