@@ -78,6 +78,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "D:\Steam\steamapps\common\Audica\Mods\$(TargetFileName)"</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetPath)" "D:\Steam\steamapps\common\Audica\Mods\$(TargetFileName)"
+copy "$(TargetDir)\$(TargetName).pdb" "D:\Steam\steamapps\common\Audica\Mods\$(TargetName).pdb"</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -14,7 +14,7 @@ namespace AudicaWebsocketServer
         internal static WebSocketServer wssv;
         internal static AudicaGameStateManager AudicaGameState { get; set; }
         internal static AudicaTargetStateManager AudicaTargetState { get; set; }
-        
+
         internal static Encoder encoder;
 
         // For moderating how often to send SongProgress events.  This is a unix timestamp,
@@ -57,8 +57,10 @@ namespace AudicaWebsocketServer
                 wssv.WebSocketServices.Broadcast(encoder.SongPlayerStatus(AudicaWebsocketServerMain.AudicaGameState.SongState));
             }
 
-
             // Every 1s, if song is playing, report progress.
+            // FIXME: Add hook for when pause screen is shown so progress isn't emitted whiled paused.
+            // FIXME: Add hook for when song is failed to stop emitting progress
+            // FIXME: Add hook for when song is finished to stop emitting progress.
             var currentDateTime = DateTimeOffset.Now.ToUnixTimeSeconds();
             if (currentDateTime > lastProgressUpdate && AudicaWebsocketServerMain.AudicaGameState.getSongPlaying())
             {
@@ -90,31 +92,28 @@ namespace AudicaWebsocketServer
         {
             public static void Postfix()
             {
-                MelonLogger.Msg("Song Start");
                 AudicaWebsocketServerMain.AudicaTargetState.SongStart();
                 AudicaWebsocketServerMain.AudicaGameState.SongStart(AudicaWebsocketServerMain.selectedSongData);
             }
         }
-        
+
 
         [HarmonyPatch(typeof(InGameUI), "Restart", new Type[0])]
         public static class RestartSongPatch
         {
             public static void Postfix()
             {
-                MelonLogger.Msg("Restart Song");
                 AudicaWebsocketServerMain.AudicaGameState.SongRestart();
                 wssv.WebSocketServices.Broadcast(encoder.SongRestart());
             }
         }
-        
+
         [HarmonyPatch(typeof(InGameUI), "ReturnToSongList", new Type[0])]
         public static class EndSongPatch
         {
             public static void Postfix()
             {
                 AudicaWebsocketServerMain.AudicaGameState.SongEnd();
-                MelonLogger.Msg("Return to Song List");
                 wssv.WebSocketServices.Broadcast(encoder.ReturnToSongList());
             }
         }
@@ -126,66 +125,31 @@ namespace AudicaWebsocketServer
         {
             public static void Postfix(ref GameplayStats __instance, ref SongCues.Cue cue, ref Vector2 targetHitPos)
             {
-                MelonLogger.Msg("Target Hit! " + targetHitPos.ToString());
                 AudicaTargetHitState targetHit = AudicaWebsocketServerMain.AudicaTargetState.TargetHit(__instance, cue, targetHitPos);
                 wssv.WebSocketServices.Broadcast(AudicaWebsocketServerMain.encoder.TargetHitEvent(targetHit, AudicaWebsocketServerMain.AudicaGameState.SongState));
             }
         }
 
-        [HarmonyPatch(typeof(GameplayStats), "ReportShotNothing", new Type[0])]
-        public static class ShotNothingPatch
+        [HarmonyPatch(typeof(ScoreKeeper), "OnFailure", new Type[] { typeof(SongCues.Cue), typeof(bool), typeof(bool) })]
+        private static class PatchScoreKeeperOnFailure
         {
-            public static void Postfix()
+            private static void Postfix(ScoreKeeper __instance, ref SongCues.Cue cue)
             {
-                MelonLogger.Msg("Shot nothing!");
-                // FIXME: This seems to fail when trying to get certain details about the target miss. Fix.
-                AudicaTargetFailState targetMiss = AudicaWebsocketServerMain.AudicaTargetState.TargetMiss();
-                wssv.WebSocketServices.Broadcast(AudicaWebsocketServerMain.encoder.TargetMiss(targetMiss));
-                
+                if (cue is null)
+                {
+                    // Ignore if there's nothing there.
+                    return;
+                }
+
+                AudicaTargetFailState targetMiss = AudicaWebsocketServerMain.AudicaTargetState.TargetMiss(cue);
+                wssv.WebSocketServices.Broadcast(encoder.TargetMiss(targetMiss));
             }
         }
-
-        [HarmonyPatch(typeof(GameplayStats), "ReportTargetAimMiss", new Type[] { typeof(SongCues.Cue), typeof(Vector2) })]
-        public static class TargetAimMissPatch
-        {
-            public static void Postfix()
-            {
-                MelonLogger.Msg("Target Miss (aim)!");
-                // FIXME: This seems to fail when trying to get certain details about the target miss. Fix.
-                AudicaTargetFailState targetMiss = AudicaWebsocketServerMain.AudicaTargetState.TargetMissAim();
-                wssv.WebSocketServices.Broadcast(AudicaWebsocketServerMain.encoder.TargetMiss(targetMiss));
-            }
-        }
-
-        [HarmonyPatch(typeof(GameplayStats), "ReportTargetEarlyLate", new Type[] { typeof(SongCues.Cue), typeof(float) })]
-        public static class TargetEarlyLatePatch
-        {
-            public static void Postfix(SongCues.Cue cue, float tick)
-            {
-                MelonLogger.Msg("Target Miss (timing)!");
-                // FIXME: seems tick doesn't exist when this is called - getting instance doesn't exist issue
-                // for now, just ignoring the tick.
-                AudicaTargetFailState targetMiss = AudicaWebsocketServerMain.AudicaTargetState.TargetMissEarlyLate();
-                wssv.WebSocketServices.Broadcast(AudicaWebsocketServerMain.encoder.TargetMiss(targetMiss));
-            }
-        }
-
-        [HarmonyPatch(typeof(GameplayStats), "ReportMisfire", new Type[0])]
-        public static class GunMisfirePatch
-        {
-            public static void Postfix()
-            {
-                MelonLogger.Msg("Misfire!");
-                
-                // FIXME: Fire some sort of event when this happens (if it happens?)
-            }
-        }
-
     }
 
     public class AudicaStats : WebSocketBehavior
     {
-        // TODO: Have something that can respond to requests - ex: Get current song, etc
+        // FIXME: Have something that can respond to requests - ex: Get current song, etc
         // FIXME: On connect, emit current song data, progress and player stats so new clients are up-to-date.
     }
 }

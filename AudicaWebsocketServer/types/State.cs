@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AudicaWebsocketServer
 {
@@ -83,10 +80,42 @@ namespace AudicaWebsocketServer
         }
     }
 
+    struct GameStats : IEquatable<GameStats> {
+        public int shotNothingCount;
+        public int wrongHandCount;
+        public int wrongOrientationCount;
+        public int shotMeleeCount;
+        public int chainBreakCount;
+        public int sustainBreakCount;
+        public int aimMissCount;
+        public int earlyLateCount;
+        public int misfireCount;
+        public int successCount;
+
+        public bool Equals(GameStats other)
+        {
+            return this.shotNothingCount == other.shotMeleeCount &&
+                this.wrongHandCount == other.wrongHandCount &&
+                this.wrongOrientationCount == other.wrongOrientationCount &&
+                this.shotMeleeCount == other.shotMeleeCount &&
+                this.chainBreakCount == other.chainBreakCount &&
+                this.sustainBreakCount == other.sustainBreakCount &&
+                this.aimMissCount == other.aimMissCount &&
+                this.earlyLateCount == other.earlyLateCount &&
+                this.misfireCount == other.misfireCount &&
+                this.successCount == other.successCount;
+        }
+    }
+
+
+
     struct AudicaSongState {
         public AudicaSongInfo songInfo;
         public AudicaSongProgress songProgress;
         public AudicaSongPlayerStatus songPlayerStatus;
+        
+        // NOTE: Not implemented right now, maybe consider later?
+        public GameStats gameStats;
     }
 
     struct AudicaTargetHitState {
@@ -97,7 +126,6 @@ namespace AudicaWebsocketServer
         public float timingScore;
         public float aimScore;
         public float tick;
-        //public UnityEngine.Vector2 targetHitPosition; 
         // Storing a string representation, as the JSON converter runs into circular references if trying to encode the Vector2 directly.
         public string targetHitPosition;
     }

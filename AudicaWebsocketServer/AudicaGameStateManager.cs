@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using AudicaWebsocketServer.util;
 
@@ -16,6 +14,7 @@ namespace AudicaWebsocketServer {
         public static PlayerPreferences prefs;
         public static KataConfig config;
         public static SongCues songCues;
+        public static GameplayStats gameplayStats;
 
 		// State containers
 		private AudicaGameState gameState;
@@ -52,6 +51,7 @@ namespace AudicaWebsocketServer {
         {
             return this.songPlaying;
         }
+
         // Called every tick, don't do anything too heavy in here!
 		public List<string> Update() {
             this.pollGameState();
@@ -93,6 +93,7 @@ namespace AudicaWebsocketServer {
             this.songState.songInfo = new AudicaSongInfo();
             this.songState.songPlayerStatus = new AudicaSongPlayerStatus();
             this.songState.songProgress = new AudicaSongProgress();
+            this.songState.gameStats = new GameStats();
 
             // this is potentially read all the time but only updates if a song is playing so we should initialise everything to actual sane values ...
             this.songState.songInfo.songId = "";
@@ -120,6 +121,16 @@ namespace AudicaWebsocketServer {
                 .Select((GameplayModifiers.Modifier mod) => GameplayModifiers.GetModifierString(mod))
                 .ToList<string>()
                 : new List<string>();
+            this.songState.gameStats.aimMissCount = 0;
+            this.songState.gameStats.chainBreakCount = 0;
+            this.songState.gameStats.earlyLateCount = 0;
+            this.songState.gameStats.misfireCount = 0;
+            this.songState.gameStats.shotMeleeCount = 0;
+            this.songState.gameStats.shotNothingCount = 0;
+            this.songState.gameStats.successCount = 0;
+            this.songState.gameStats.sustainBreakCount = 0;
+            this.songState.gameStats.wrongHandCount = 0;
+            this.songState.gameStats.wrongOrientationCount = 0;
         }
 
         private void pollGameState() {
@@ -164,12 +175,12 @@ namespace AudicaWebsocketServer {
                 newSongInfo.songAuthor = this.songData.author;
                 newSongInfo.difficulty = KataConfig.GetDifficultyName(AudicaGameStateManager.config.GetDifficulty());
                 newSongInfo.classification = songClass;
-                newSongInfo.songLength = TimeSpan.FromMilliseconds(Convert.ToInt64(totalTimeMs)).ToString();
+                newSongInfo.songLength = TimeSpan.FromMilliseconds(Convert.ToInt64(totalTimeMs)).ToString("m:ss");
                 newSongInfo.ticksTotal = songEndTicks;
 
                 AudicaSongProgress newSongProgress = new AudicaSongProgress();
-                newSongProgress.timeElapsed = TimeSpan.FromMilliseconds(Convert.ToInt64(currentTimeMs)).ToString();
-                newSongProgress.timeRemaining = TimeSpan.FromMilliseconds(Convert.ToInt64(remainingTimeMs)).ToString();
+                newSongProgress.timeElapsed = TimeSpan.FromMilliseconds(Convert.ToInt64(currentTimeMs)).ToString("m:ss");
+                newSongProgress.timeRemaining = TimeSpan.FromMilliseconds(Convert.ToInt64(remainingTimeMs)).ToString("m:ss");
                 newSongProgress.progress = currentTimeMs / totalTimeMs;
                 newSongProgress.currentTick = currentTick;
 
@@ -190,7 +201,29 @@ namespace AudicaWebsocketServer {
                     .Select((GameplayModifiers.Modifier mod) => GameplayModifiers.GetModifierString(mod))
                     .ToList<string>();
 
-
+                // FIXME: Consider whether to resurrect the gameStats stuff below.  Could be useful for cases where websocket disconnects/reconnects mid-song and needs
+                //        context of current state.
+                //AudicaGameStateManager.gameplayStats = UnityEngine.Object.FindObjectOfType<GameplayStats>();
+                //if (AudicaGameStateManager.gameplayStats)
+                //{
+                //    MelonLoader.MelonLogger.Msg("Got gameplayStats");
+                //    GameStats newGameStats = new GameStats();
+                //    newGameStats.misfireCount = gameplayStats.mMisfireCount;
+                //    newGameStats.earlyLateCount = gameplayStats.mEarlyLateCount;
+                //    newGameStats.aimMissCount = gameplayStats.mAimMissCount;
+                //    newGameStats.chainBreakCount = gameplayStats.mChainBreakCount;
+                //    newGameStats.shotMeleeCount = gameplayStats.mShotMeleeCount;
+                //    newGameStats.shotNothingCount = gameplayStats.mShotNothingCount;
+                //    newGameStats.successCount = gameplayStats.mSuccessCount;
+                //    newGameStats.sustainBreakCount = gameplayStats.mSustainBreakCount;
+                //    newGameStats.wrongHandCount = gameplayStats.mWrongHandCount;
+                //    newGameStats.wrongOrientationCount = gameplayStats.mWrongOrientationCount;
+                //    if (!this.SongState.gameStats.Equals(newGameStats))
+                //    {
+                //        changedStates.Add("GameStats");
+                //    }
+                //    this.songState.gameStats = newGameStats;
+                //}
 
                 // As we update the songState overall, determine which pieces changed, and let the caller know
                 // what changed so websocket events can be emitted.
@@ -205,9 +238,11 @@ namespace AudicaWebsocketServer {
                     changedStates.Add("SongPlayerStatus");
                 }
 
+
                 this.songState.songInfo = newSongInfo;
                 this.songState.songPlayerStatus = newSongPlayerStatus;
                 this.songState.songProgress = newSongProgress;
+                
             }
 
             return changedStates;

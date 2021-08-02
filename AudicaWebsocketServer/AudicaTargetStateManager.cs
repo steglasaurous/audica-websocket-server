@@ -19,55 +19,37 @@ namespace AudicaWebsocketServer {
 
         public AudicaTargetHitState TargetHit(GameplayStats gameplayStats, SongCues.Cue cue, Vector2 targetHitPos) {
             AudicaTargetHitState targetHit = new AudicaTargetHitState();
-
             targetHit.targetIndex = cue.index;
-            targetHit.type = this.cueToTargetType(cue);
-            targetHit.hand = this.cueToHand(cue);
+            targetHit.type = cue.behavior.ToString();
+            targetHit.hand = cue.handType.ToString();
             targetHit.timingScore = gameplayStats.GetLastTimingScore();
             targetHit.aimScore = gameplayStats.GetLastAimScore();
             targetHit.score = targetHit.timingScore + targetHit.aimScore;       // TODO: may need to multiply by combo? Need to test
             targetHit.tick = cue.tick;
             targetHit.targetHitPosition = targetHitPos.ToString();
-
             return targetHit;
         }
 
-        public AudicaTargetFailState TargetMiss() {
+        public AudicaTargetFailState TargetMiss(SongCues.Cue cue) {
             AudicaTargetFailState targetMiss = new AudicaTargetFailState();
-            SongCues.Cue cue = AudicaTargetStateManager.targetTracker.mLastEitherHandTarget.target.GetCue();
 
             targetMiss.targetIndex = cue.index;
-            targetMiss.type = this.cueToTargetType(cue);
-            targetMiss.hand = this.cueToHand(cue);
-            targetMiss.reason = "miss";
-            return targetMiss;
-        }
+            targetMiss.type = cue.behavior.ToString();
+            targetMiss.hand = cue.handType.ToString();
 
-        public AudicaTargetFailState TargetMissAim() {
-            AudicaTargetFailState targetMiss = new AudicaTargetFailState();
-            SongCues.Cue cue = AudicaTargetStateManager.targetTracker.mLastEitherHandTarget.target.GetCue();
-
-            targetMiss.targetIndex = cue.index;
-            targetMiss.type = this.cueToTargetType(cue);
-            targetMiss.hand = this.cueToHand(cue);
-            targetMiss.reason = "aim";
-            return targetMiss;
-        }
-
-        public AudicaTargetFailState TargetMissEarlyLate() {
-            // FIXME: Find out how I might get more target info so early/late can be determined
+            if (cue.behavior == Target.TargetBehavior.Chain)
+            {
+                targetMiss.reason = "ChainBreak";
+            }
+            else if (cue.behavior == Target.TargetBehavior.Hold && cue.target.mSustainFailed)
+            {
+                targetMiss.reason = "SustainBreak";
+            }
+            else
+            {
+                targetMiss.reason = "Miss";
+            }
             
-            AudicaTargetFailState targetMiss = new AudicaTargetFailState();
-
-            // FIXME: Seems to be blowing up here too complaining the instance doesn't exist
-            SongCues.Cue cue = AudicaTargetStateManager.targetTracker.mLastEitherHandTarget.target.GetCue();
-
-            targetMiss.targetIndex = cue.index;
-            targetMiss.type = this.cueToTargetType(cue);
-            targetMiss.hand = this.cueToHand(cue);
-            //targetMiss.reason = tick < cue.tick ? "early" : "late";
-            targetMiss.reason = "early";
-
             return targetMiss;
         }
 
@@ -75,6 +57,7 @@ namespace AudicaWebsocketServer {
             AudicaTargetStateManager.targetTracker = UnityEngine.Object.FindObjectOfType<TargetTracker>();
         }
 
+        // FIXME: Not sure we need to do this translation?  ToString() seems to convert these values nicely.
         private string cueToTargetType(SongCues.Cue cue) {
             string type = "";
             switch (cue.behavior) {
