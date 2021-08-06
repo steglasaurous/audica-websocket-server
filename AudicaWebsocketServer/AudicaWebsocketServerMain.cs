@@ -125,8 +125,11 @@ namespace AudicaWebsocketServer
         {
             public static void Postfix(ref GameplayStats __instance, ref SongCues.Cue cue, ref Vector2 targetHitPos)
             {
-                AudicaTargetHitState targetHit = AudicaWebsocketServerMain.AudicaTargetState.TargetHit(__instance, cue, targetHitPos);
-                wssv.WebSocketServices.Broadcast(AudicaWebsocketServerMain.encoder.TargetHitEvent(targetHit, AudicaWebsocketServerMain.AudicaGameState.SongState));
+                AudicaTargetHitState? targetHit = AudicaWebsocketServerMain.AudicaTargetState.TargetHit(__instance, cue, targetHitPos);
+                if (targetHit != null)
+                {
+                    wssv.WebSocketServices.Broadcast(AudicaWebsocketServerMain.encoder.TargetHitEvent((AudicaTargetHitState)targetHit, AudicaWebsocketServerMain.AudicaGameState.SongState));
+                }
             }
         }
 
@@ -141,8 +144,11 @@ namespace AudicaWebsocketServer
                     return;
                 }
 
-                AudicaTargetFailState targetMiss = AudicaWebsocketServerMain.AudicaTargetState.TargetMiss(cue);
-                wssv.WebSocketServices.Broadcast(encoder.TargetMiss(targetMiss));
+                AudicaTargetFailState? targetMiss = AudicaWebsocketServerMain.AudicaTargetState.TargetMiss(cue);
+                if (targetMiss != null)
+                {
+                    wssv.WebSocketServices.Broadcast(encoder.TargetMiss((AudicaTargetFailState)targetMiss));
+                }
             }
         }
     }

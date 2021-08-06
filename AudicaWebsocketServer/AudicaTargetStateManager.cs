@@ -8,16 +8,27 @@ using UnityEngine;
 
 namespace AudicaWebsocketServer {
     class AudicaTargetStateManager {
+        // FIXME: Right now this isn't used anywhere in this class.  Delete it? 
         public static TargetTracker targetTracker;
 
+        public static Dictionary<int, AudicaTargetHitState> targetHits = new Dictionary<int, AudicaTargetHitState>();
+        public static Dictionary<int, AudicaTargetFailState> targetMisses = new Dictionary<int, AudicaTargetFailState>();
+        
         public AudicaTargetStateManager() { }
 
         // Must be called when a song starts in order to fetch correct targets 
         public void SongStart() {
             this.initialiseStateManagers();
+            targetHits.Clear();
+            targetMisses.Clear();
         }
 
-        public AudicaTargetHitState TargetHit(GameplayStats gameplayStats, SongCues.Cue cue, Vector2 targetHitPos) {
+        public AudicaTargetHitState? TargetHit(GameplayStats gameplayStats, SongCues.Cue cue, Vector2 targetHitPos) {
+            // Check to see if we processed this already or not
+            if (AudicaTargetStateManager.targetHits.ContainsKey(cue.index))
+            {
+                return null;
+            }
             AudicaTargetHitState targetHit = new AudicaTargetHitState();
             targetHit.targetIndex = cue.index;
             targetHit.type = cue.behavior.ToString();
@@ -27,10 +38,17 @@ namespace AudicaWebsocketServer {
             targetHit.score = targetHit.timingScore + targetHit.aimScore;       // TODO: may need to multiply by combo? Need to test
             targetHit.tick = cue.tick;
             targetHit.targetHitPosition = targetHitPos.ToString();
+
+            AudicaTargetStateManager.targetHits.Add(cue.index, targetHit);
+
             return targetHit;
         }
 
-        public AudicaTargetFailState TargetMiss(SongCues.Cue cue) {
+        public AudicaTargetFailState? TargetMiss(SongCues.Cue cue) {
+            if (AudicaTargetStateManager.targetMisses.ContainsKey(cue.index))
+            {
+                return null;
+            }
             AudicaTargetFailState targetMiss = new AudicaTargetFailState();
 
             targetMiss.targetIndex = cue.index;
@@ -49,7 +67,9 @@ namespace AudicaWebsocketServer {
             {
                 targetMiss.reason = "Miss";
             }
-            
+
+            AudicaTargetStateManager.targetMisses.Add(cue.index, targetMiss);
+
             return targetMiss;
         }
 
