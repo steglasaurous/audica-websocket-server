@@ -66,6 +66,7 @@ namespace AudicaWebsocketServer
         public string classification;   // "ost" | "dlc" | "extra" | "custom"
         public string songLength;       // UTC
         public float ticksTotal;
+        public string albumArtData;
 
         public bool Equals(AudicaSongInfo other)
         {

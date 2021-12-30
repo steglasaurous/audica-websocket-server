@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using AudicaWebsocketServer.util;
+using AudicaModding;
 
 namespace AudicaWebsocketServer {
 
@@ -178,6 +179,21 @@ namespace AudicaWebsocketServer {
                 newSongInfo.songLength = TimeSpan.FromMilliseconds(Convert.ToInt64(totalTimeMs)).ToString(@"m\:ss");
                 newSongInfo.ticksTotal = songEndTicks;
 
+                // Get the album art, if present.
+                if (SongDataLoader.AllSongData[this.songData.songID].HasCustomData())
+                {
+                    byte[] albumArtData = SongDataLoader.AllSongData[this.songData.songID].albumArtData;
+
+                    if (albumArtData != null)
+                    {
+                        newSongInfo.albumArtData = Convert.ToBase64String(albumArtData);
+                    }
+                    else
+                    {
+                        newSongInfo.albumArtData = "";
+                    }
+                }
+
                 AudicaSongProgress newSongProgress = new AudicaSongProgress();
                 newSongProgress.timeElapsed = TimeSpan.FromMilliseconds(Convert.ToInt64(currentTimeMs)).ToString(@"m\:ss");
                 newSongProgress.timeRemaining = TimeSpan.FromMilliseconds(Convert.ToInt64(remainingTimeMs)).ToString(@"m\:ss");
@@ -201,30 +217,6 @@ namespace AudicaWebsocketServer {
                     .Select((GameplayModifiers.Modifier mod) => GameplayModifiers.GetModifierString(mod))
                     .ToList<string>();
 
-                // FIXME: Consider whether to resurrect the gameStats stuff below.  Could be useful for cases where websocket disconnects/reconnects mid-song and needs
-                //        context of current state.
-                //AudicaGameStateManager.gameplayStats = UnityEngine.Object.FindObjectOfType<GameplayStats>();
-                //if (AudicaGameStateManager.gameplayStats)
-                //{
-                //    MelonLoader.MelonLogger.Msg("Got gameplayStats");
-                //    GameStats newGameStats = new GameStats();
-                //    newGameStats.misfireCount = gameplayStats.mMisfireCount;
-                //    newGameStats.earlyLateCount = gameplayStats.mEarlyLateCount;
-                //    newGameStats.aimMissCount = gameplayStats.mAimMissCount;
-                //    newGameStats.chainBreakCount = gameplayStats.mChainBreakCount;
-                //    newGameStats.shotMeleeCount = gameplayStats.mShotMeleeCount;
-                //    newGameStats.shotNothingCount = gameplayStats.mShotNothingCount;
-                //    newGameStats.successCount = gameplayStats.mSuccessCount;
-                //    newGameStats.sustainBreakCount = gameplayStats.mSustainBreakCount;
-                //    newGameStats.wrongHandCount = gameplayStats.mWrongHandCount;
-                //    newGameStats.wrongOrientationCount = gameplayStats.mWrongOrientationCount;
-                //    if (!this.SongState.gameStats.Equals(newGameStats))
-                //    {
-                //        changedStates.Add("GameStats");
-                //    }
-                //    this.songState.gameStats = newGameStats;
-                //}
-
                 // As we update the songState overall, determine which pieces changed, and let the caller know
                 // what changed so websocket events can be emitted.
                 // FIXME: Is this indeed the most efficient means of doing this?  Or should we look at a pub/sub / Observer pattern here?
@@ -242,7 +234,8 @@ namespace AudicaWebsocketServer {
                 this.songState.songInfo = newSongInfo;
                 this.songState.songPlayerStatus = newSongPlayerStatus;
                 this.songState.songProgress = newSongProgress;
-                
+
+
             }
 
             return changedStates;

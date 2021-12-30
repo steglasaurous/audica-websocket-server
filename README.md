@@ -41,10 +41,13 @@ Emitted when the player starts playing the song.  This also triggers `SongProgre
         "difficulty": "Expert",
         "classification": "extras",
         "songLength": "2:51",
-        "ticksTotal": 130400.0
+        "ticksTotal": 130400.0,
+        "albumArtData": "ALBUM_ART_DATA_HERE_OR_NULL"
     }
 }
 ```
+
+NOTE: `albumArtData` is the base64-encoded album art image, which is a png.  When no album art is available, null is returned.  
 
 ### SongRestart
 
