@@ -160,3 +160,27 @@ Emitted when the user hits the "Return to Song List" button.  Note this also sto
     "data": ""
 }
 ```
+
+## Emitting Websocket Events from Other Mods
+
+You can now emit websocket events through the same websocket connection as the built-in events.  
+
+1. In your project, include AudicaWebsocketServer.dll as a reference.
+2. Create an `EventContainer` object with an event type (can be any string), and your object data you'd like to emit.  Then call `EmitWebsocketEvent()`.  
+
+Example:
+
+```csharp
+using AudicaWebsocketServer;
+
+// ... In your code:
+
+    EventContainer eventContainer = new EventContainer();
+    eventContainer.eventType = "ExampleEvent";
+    eventContainer.data = myObject;
+
+    AudicaWebsocketServerMain.EmitWebsocketEvent(eventContainer);
+```
+
+The object set in data must be serializable by `Newtonsoft.Json.JsonConvert.SerializeObject()` (which does a pretty good job of conversion for the most part).
+
