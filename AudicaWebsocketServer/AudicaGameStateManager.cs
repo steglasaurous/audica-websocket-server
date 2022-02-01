@@ -177,6 +177,7 @@ namespace AudicaWebsocketServer {
                 newSongInfo.difficulty = KataConfig.GetDifficultyName(AudicaGameStateManager.config.GetDifficulty());
                 newSongInfo.classification = songClass;
                 newSongInfo.songLength = TimeSpan.FromMilliseconds(Convert.ToInt64(totalTimeMs)).ToString(@"m\:ss");
+                newSongInfo.songLengthSeconds = Convert.ToInt64(Math.Floor(totalTimeMs / 1000));
                 newSongInfo.ticksTotal = songEndTicks;
 
                 // Get the album art, if present.
@@ -197,6 +198,8 @@ namespace AudicaWebsocketServer {
                 AudicaSongProgress newSongProgress = new AudicaSongProgress();
                 newSongProgress.timeElapsed = TimeSpan.FromMilliseconds(Convert.ToInt64(currentTimeMs)).ToString(@"m\:ss");
                 newSongProgress.timeRemaining = TimeSpan.FromMilliseconds(Convert.ToInt64(remainingTimeMs)).ToString(@"m\:ss");
+                newSongProgress.timeElapsedSeconds = Convert.ToInt64(Math.Floor(currentTimeMs / 1000));
+                newSongProgress.timeRemainingSeconds = Convert.ToInt64(Math.Floor(remainingTimeMs / 1000));
                 newSongProgress.progress = currentTimeMs / totalTimeMs;
                 newSongProgress.currentTick = currentTick;
 

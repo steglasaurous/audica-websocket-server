@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AudicaWebsocketServer
 {
-	struct EventContainer
+	public struct EventContainer
     {
 		public string eventType;
 		public Object data;

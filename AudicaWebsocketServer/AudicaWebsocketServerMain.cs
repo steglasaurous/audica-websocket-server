@@ -24,6 +24,12 @@ namespace AudicaWebsocketServer
         // isn't adversely affected.
         private long lastProgressUpdate;
 
+        // For use by other mods - allows others to emit a websocket event.
+        public static void EmitWebsocketEvent(EventContainer eventContainer)
+        {
+            wssv.WebSocketServices.Broadcast(Newtonsoft.Json.JsonConvert.SerializeObject(eventContainer));
+        }
+
         public override void OnApplicationStart()
         {
             base.OnApplicationStart();
@@ -143,7 +149,7 @@ namespace AudicaWebsocketServer
                     // Ignore if there's nothing there.
                     return;
                 }
-
+                
                 AudicaTargetFailState? targetMiss = AudicaWebsocketServerMain.AudicaTargetState.TargetMiss(cue);
                 if (targetMiss != null)
                 {
