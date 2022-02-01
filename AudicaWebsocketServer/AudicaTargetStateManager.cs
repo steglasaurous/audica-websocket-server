@@ -39,7 +39,7 @@ namespace AudicaWebsocketServer {
             targetHit.score = targetHit.timingScore + targetHit.aimScore;       // TODO: may need to multiply by combo? Need to test
             targetHit.tick = cue.tick;
             targetHit.targetHitPosition = targetHitPos.ToString();
-            targetHit.zOffset = cue.zOffset;
+            //targetHit.zOffset = cue.zOffset;
 
             AudicaTargetStateManager.targetHits.Add(cue.index, targetHit);
 
@@ -72,7 +72,7 @@ namespace AudicaWebsocketServer {
 
             // Figure out how to get 'early' and 'late' timings
             
-            targetMiss.zOffset = cue.zOffset;
+            //targetMiss.zOffset = cue.zOffset;
 
             AudicaTargetStateManager.targetMisses.Add(cue.index, targetMiss);
 

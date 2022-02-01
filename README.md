@@ -41,6 +41,7 @@ Emitted when the player starts playing the song.  This also triggers `SongProgre
         "difficulty": "Expert",
         "classification": "extras",
         "songLength": "2:51",
+        "songLengthSeconds": 171,
         "ticksTotal": 130400.0,
         "albumArtData": "ALBUM_ART_DATA_HERE_OR_NULL"
     }
@@ -68,7 +69,9 @@ When song playing starts, this is emitted once per second.  Emission stops when 
     "data": {
         "progress": 0.0133128827,
         "timeElapsed": "0:02",
+        "timeElapsedSeconds": 2,
         "timeRemaining": "2:49",
+        "timeRemainingSeconds": 169,
         "currentTick": 1736.0
     }
 }

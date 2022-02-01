@@ -132,7 +132,7 @@ namespace AudicaWebsocketServer
         public float tick;
         // Storing a string representation, as the JSON converter runs into circular references if trying to encode the Vector2 directly.
         public string targetHitPosition;
-        public float zOffset;
+        //public float zOffset;
     }
 
     struct AudicaTargetFailState {
@@ -140,6 +140,6 @@ namespace AudicaWebsocketServer
         public string type;         // "melee" | "standard" | "sustain" | "vertical" | "horizontal" | "chain-start" | "chain" | "bomb"
         public string hand;         // "left" | "right" | "either" | "none" (e.g. for bombs)
         public string reason;       // "miss" | "aim" | "early" | "late"
-        public float zOffset;
+        //public float zOffset;
     }
 }
