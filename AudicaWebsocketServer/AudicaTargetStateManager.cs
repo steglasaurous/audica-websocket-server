@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using MelonLoader;
 
 namespace AudicaWebsocketServer {
     class AudicaTargetStateManager {
@@ -38,6 +39,7 @@ namespace AudicaWebsocketServer {
             targetHit.score = targetHit.timingScore + targetHit.aimScore;       // TODO: may need to multiply by combo? Need to test
             targetHit.tick = cue.tick;
             targetHit.targetHitPosition = targetHitPos.ToString();
+            //targetHit.zOffset = cue.zOffset;
 
             AudicaTargetStateManager.targetHits.Add(cue.index, targetHit);
 
@@ -67,6 +69,10 @@ namespace AudicaWebsocketServer {
             {
                 targetMiss.reason = "Miss";
             }
+
+            // Figure out how to get 'early' and 'late' timings
+            
+            //targetMiss.zOffset = cue.zOffset;
 
             AudicaTargetStateManager.targetMisses.Add(cue.index, targetMiss);
 

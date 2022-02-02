@@ -41,10 +41,14 @@ Emitted when the player starts playing the song.  This also triggers `SongProgre
         "difficulty": "Expert",
         "classification": "extras",
         "songLength": "2:51",
-        "ticksTotal": 130400.0
+        "songLengthSeconds": 171,
+        "ticksTotal": 130400.0,
+        "albumArtData": "ALBUM_ART_DATA_HERE_OR_NULL"
     }
 }
 ```
+
+NOTE: `albumArtData` is the base64-encoded album art image, which is a png.  When no album art is available, null is returned.  
 
 ### SongRestart
 
@@ -65,7 +69,9 @@ When song playing starts, this is emitted once per second.  Emission stops when 
     "data": {
         "progress": 0.0133128827,
         "timeElapsed": "0:02",
+        "timeElapsedSeconds": 2,
         "timeRemaining": "2:49",
+        "timeRemainingSeconds": 169,
         "currentTick": 1736.0
     }
 }
@@ -154,3 +160,27 @@ Emitted when the user hits the "Return to Song List" button.  Note this also sto
     "data": ""
 }
 ```
+
+## Emitting Websocket Events from Other Mods
+
+You can now emit websocket events through the same websocket connection as the built-in events.  
+
+1. In your project, include AudicaWebsocketServer.dll as a reference.
+2. Create an `EventContainer` object with an event type (can be any string), and your object data you'd like to emit.  Then call `EmitWebsocketEvent()`.  
+
+Example:
+
+```csharp
+using AudicaWebsocketServer;
+
+// ... In your code:
+
+    EventContainer eventContainer = new EventContainer();
+    eventContainer.eventType = "ExampleEvent";
+    eventContainer.data = myObject;
+
+    AudicaWebsocketServerMain.EmitWebsocketEvent(eventContainer);
+```
+
+The object set in data must be serializable by `Newtonsoft.Json.JsonConvert.SerializeObject()` (which does a pretty good job of conversion for the most part).
+

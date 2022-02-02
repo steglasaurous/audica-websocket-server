@@ -16,6 +16,8 @@ namespace AudicaWebsocketServer
         public float progress;
         public string timeElapsed;
         public string timeRemaining;
+        public float timeElapsedSeconds;
+        public float timeRemainingSeconds;
         public float currentTick;
 
         public bool Equals(AudicaSongProgress other)
@@ -65,7 +67,9 @@ namespace AudicaWebsocketServer
         public string difficulty;       // "beginner" | "standard" | "advanced" | "expert"
         public string classification;   // "ost" | "dlc" | "extra" | "custom"
         public string songLength;       // UTC
+        public float songLengthSeconds;
         public float ticksTotal;
+        public string albumArtData;
 
         public bool Equals(AudicaSongInfo other)
         {
@@ -128,6 +132,7 @@ namespace AudicaWebsocketServer
         public float tick;
         // Storing a string representation, as the JSON converter runs into circular references if trying to encode the Vector2 directly.
         public string targetHitPosition;
+        //public float zOffset;
     }
 
     struct AudicaTargetFailState {
@@ -135,5 +140,6 @@ namespace AudicaWebsocketServer
         public string type;         // "melee" | "standard" | "sustain" | "vertical" | "horizontal" | "chain-start" | "chain" | "bomb"
         public string hand;         // "left" | "right" | "either" | "none" (e.g. for bombs)
         public string reason;       // "miss" | "aim" | "early" | "late"
+        //public float zOffset;
     }
 }
