@@ -4,6 +4,10 @@ Exposes a websocket server that emits events about game data.  Useful for stream
 
 Note this, like many mods, is a work-in-progress.  There may be bugs :)  Please do file issues in the Github issues tab of this repo if you find them.
 
+## Dependencies
+
+This mod requires the [SongDataLoader](https://github.com/MeepsKitten/Audica-SongDataLoader) mod be installed to function properly (For retrieving album art).  You can install this via the in-game mod installer.  
+
 ## Usage
 
 Unzip the .zip file into the root of your Audica folder.  
